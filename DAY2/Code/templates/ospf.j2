@@ -1,0 +1,7 @@
+! ===== OSPFv2 配置 =====
+router ospf {{ host.data.ospf.process_id }}
+ router-id {{ host.data.ospf.router_id }}
+{% for net in host.data.ospf.networks %}
+ network {{ net.network }} {{ net.wildcard }} area {{ net.area }}
+{% endfor %}
+!

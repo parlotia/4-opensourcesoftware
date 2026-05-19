@@ -1,0 +1,21 @@
+---
+# 默认参数：所有设备共用的登录凭据 + 业务通用数据
+username: admin
+password: Cisc0123
+
+data:
+  # 系统信息（hostname/dns/domain）
+  domain_name: qytang.com
+  dns_servers:
+    - 114.114.114.114
+    - 8.8.8.8
+
+  # 用户列表（密码可选 vault；本作业为简化，明文写入并在截图时打码）
+  users:
+    - {username: qytadmin,   privilege: 15, password: Cisc0123}
+    - {username: otheradmin, privilege: 1,  password: Cisc0123}
+
+  # Syslog 服务器（按真实环境：Linux 10.10.1.205 = 本环境真实 SYSLOG）
+  syslog_servers:
+    - 10.10.1.205
+  console_severity: notifications

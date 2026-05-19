@@ -1,0 +1,55 @@
+---
+# 清理两台 C8Kv 业务配置，仅保留管理地址与 SSH
+- name: Cleanup C8Kv (keep mgmt + SSH only)
+  hosts: C8Kv
+  gather_facts: false
+
+  tasks:
+    - name: Remove non-mgmt interfaces (Loopback0/1)
+      cisco.ios.ios_config:
+        lines:
+          - no interface Loopback0
+          - no interface Loopback1
+      ignore_errors: true
+
+    - name: Default business interfaces (Gi2/Gi3)
+      cisco.ios.ios_config:
+        lines:
+          - default interface GigabitEthernet2
+          - default interface GigabitEthernet3
+      ignore_errors: true
+
+    - name: Remove routing protocols
+      cisco.ios.ios_config:
+        lines:
+          - no router ospf 1
+          - no router bgp 65001
+      ignore_errors: true
+
+    - name: Remove logging
+      cisco.ios.ios_config:
+        lines:
+          - no logging console
+          - no logging trap
+          - no logging host 10.10.1.101
+          - no logging host 192.168.1.100
+          - no logging host 192.168.1.101
+      ignore_errors: true
+
+    - name: Remove DNS / NTP
+      cisco.ios.ios_config:
+        lines:
+          - no ip name-server 114.114.114.114 8.8.8.8
+          - no ntp server ntp.aliyun.com
+      ignore_errors: true
+
+    - name: Remove extra users (keep admin)
+      cisco.ios.ios_config:
+        lines:
+          - no username qytadmin
+          - no username otheradmin
+      ignore_errors: true
+
+    - name: Save running config
+      cisco.ios.ios_config:
+        save_when: modified

@@ -1,0 +1,11 @@
+---
+# 设备分组：保存 Cisco IOS 设备的通用连接参数
+cisco_ios:
+  platform: cisco_ios
+  connection_options:
+    netmiko:
+      platform: cisco_ios
+      extras:
+        secret: Cisc0123
+        fast_cli: false
+        global_delay_factor: 1

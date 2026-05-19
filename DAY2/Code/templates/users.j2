@@ -1,0 +1,4 @@
+! ===== 本地用户 =====
+{% for user in host.defaults.data.users %}
+username {{ user.username }} privilege {{ user.privilege }} secret {{ user.password }}
+{% endfor %}

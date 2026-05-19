@@ -1,0 +1,45 @@
+---
+# 全局系统数据
+c8kv_system:
+  domain_name: qytang.com
+  name_servers:
+    - 114.114.114.114
+    - 8.8.8.8
+
+# 本地用户（两台设备共用）
+c8kv_user_db:
+  - username: qytadmin
+    secret: Cisc0123
+    privilege: 15
+  - username: otheradmin
+    secret: Cisc0123
+    privilege: 1
+
+# 接口数据：按 inventory_hostname 索引
+c8kv_interfaces:
+  C8Kv1:
+    - {name: Loopback0, ipv4: 1.1.1.1/24}
+    - {name: GigabitEthernet2, ipv4: 61.128.1.1/24, enabled: true}
+  C8Kv2:
+    - {name: Loopback0, ipv4: 2.2.2.2/24}
+    - {name: GigabitEthernet2, ipv4: 61.128.1.2/24, enabled: true}
+
+# OSPF 数据：按 inventory_hostname 索引
+c8kv_ospf:
+  C8Kv1:
+    router_id: 1.1.1.1
+    networks:
+      - {address: 1.1.1.0, wildcard_bits: 0.0.0.255, area: 0}
+      - {address: 61.128.1.0, wildcard_bits: 0.0.0.255, area: 0}
+  C8Kv2:
+    router_id: 2.2.2.2
+    networks:
+      - {address: 2.2.2.0, wildcard_bits: 0.0.0.255, area: 0}
+      - {address: 61.128.1.0, wildcard_bits: 0.0.0.255, area: 0}
+
+# Logging 配置（两台设备共用）
+# Linux 服务器 10.10.1.205 为本环境真实 SYSLOG 服务器
+c8kv_logging:
+  console_severity: notifications
+  hosts:
+    - hostname: 10.10.1.205

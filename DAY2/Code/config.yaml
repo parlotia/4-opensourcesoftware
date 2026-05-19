@@ -1,0 +1,16 @@
+---
+# Nornir 主配置文件：指定 inventory 插件、文件路径和并发参数
+inventory:
+  plugin: SimpleInventory
+  options:
+    host_file: "inventory/hosts.yaml"
+    group_file: "inventory/groups.yaml"
+    defaults_file: "inventory/defaults.yaml"
+
+runner:
+  plugin: threaded
+  options:
+    num_workers: 10
+
+logging:
+  enabled: false

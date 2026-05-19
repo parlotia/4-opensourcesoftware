@@ -1,0 +1,4 @@
+! ===== 系统配置：hostname / DNS / domain =====
+hostname {{ host.data.hostname_config }}
+ip name-server {{ host.defaults.data.dns_servers | join(' ') }}
+ip domain name {{ host.defaults.data.domain_name }}

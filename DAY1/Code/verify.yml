@@ -1,0 +1,16 @@
+---
+- hosts: C8Kv
+  gather_facts: false
+  tasks:
+    - name: Verify
+      cisco.ios.ios_command:
+        commands:
+          - show ip interface brief | include Loopback0|GigabitEthernet2
+          - show running-config | section router ospf
+          - show running-config | include ^logging
+          - show running-config | include ^username
+      register: r
+
+    - name: Print
+      debug:
+        var: r.stdout_lines

@@ -1,0 +1,64 @@
+---
+- name: Configure Cisco C8Kv routers via Ansible
+  hosts: C8Kv
+  gather_facts: false
+  vars_files:
+    - data.yml
+
+  tasks:
+    - name: Configure hostname / domain / DNS (ios_system)
+      cisco.ios.ios_system:
+        hostname: "{{ inventory_hostname }}"
+        domain_name: "{{ c8kv_system.domain_name }}"
+        name_servers: "{{ c8kv_system.name_servers }}"
+        state: present
+
+    - name: Configure local users (ios_user)
+      cisco.ios.ios_user:
+        name: "{{ item.username }}"
+        configured_password: "{{ item.secret }}"
+        privilege: "{{ item.privilege }}"
+        password_type: secret
+        update_password: on_create
+        state: present
+      loop: "{{ c8kv_user_db }}"
+      no_log: true
+
+    - name: Configure Layer 3 interface addresses (ios_l3_interfaces)
+      cisco.ios.ios_l3_interfaces:
+        config:
+          - name: "{{ item.name }}"
+            ipv4:
+              - address: "{{ item.ipv4 }}"
+        state: merged
+      loop: "{{ c8kv_interfaces[inventory_hostname] }}"
+
+    - name: Bring routed interfaces up (ios_interfaces)
+      cisco.ios.ios_interfaces:
+        config:
+          - name: "{{ item.name }}"
+            enabled: true
+        state: merged
+      loop: "{{ c8kv_interfaces[inventory_hostname] }}"
+      when: item.enabled | default(false)
+
+    - name: Configure OSPFv2 (ios_ospfv2)
+      cisco.ios.ios_ospfv2:
+        config:
+          processes:
+            - process_id: 1
+              router_id: "{{ c8kv_ospf[inventory_hostname].router_id }}"
+              network: "{{ c8kv_ospf[inventory_hostname].networks }}"
+        state: merged
+
+    - name: Configure logging (ios_logging_global)
+      cisco.ios.ios_logging_global:
+        config:
+          console:
+            severity: "{{ c8kv_logging.console_severity }}"
+          hosts: "{{ c8kv_logging.hosts }}"
+        state: merged
+
+    - name: Save running config (ios_config)
+      cisco.ios.ios_config:
+        save_when: modified

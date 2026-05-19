@@ -1,0 +1,22 @@
+# Python venv
+.venv/
+venv/
+env/
+
+# Ansible Galaxy installed collections (use requirements.yml to reinstall)
+DAY1/Code/collections/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

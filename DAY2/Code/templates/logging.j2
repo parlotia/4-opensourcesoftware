@@ -1,0 +1,5 @@
+! ===== 日志配置：console + syslog server =====
+logging console {{ host.defaults.data.console_severity }}
+{% for server in host.defaults.data.syslog_servers %}
+logging host {{ server }}
+{% endfor %}
