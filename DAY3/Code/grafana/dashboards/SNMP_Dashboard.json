@@ -1,0 +1,425 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "qyt-influxdb2"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": null,
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "qyt-influxdb2"
+          },
+          "query": "from(bucket: \"qytdb\")                                         // 从名为\"qytdb\"的数据桶中读取数据\r\n  |> range(start: v.timeRangeStart, stop:v.timeRangeStop)     // 根据仪表板设置的时间范围筛选数据\r\n  |> filter(fn: (r) =>                                        // 使用过滤器函数筛选特定的测量和字段\r\n    r._measurement == \"C8Kv_Snmp_v2c\" and                     // 筛选SNMP采集的思科路由器数据\r\n    r._field == \"CPUTotal5sec\"                                // 只保留5秒平均CPU使用率数据\r\n  )\r\n  |> keep(columns: [\"_time\", \"_value\", \"source\"])         // 只保留时间戳、CPU值和设备主机名称\r\n  |> yield(name: \"CPU_utilization\")                           // 将结果命名为\"CPU_utilization\"以在图表中显示\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "路由器CPU利用率",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "qyt-influxdb2"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": null,
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "timezone": [
+          "Asia/Shanghai"
+        ],
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "qyt-influxdb2"
+          },
+          "query": "from(bucket: \"qytdb\")                                         // 从名为\"qytdb\"的数据桶中读取数据\r\n  |> range(start: v.timeRangeStart, stop:v.timeRangeStop)     // 根据仪表板设置的时间范围筛选数据\r\n  |> filter(fn: (r) =>                                        // 使用过滤器函数筛选特定的测量和字段\r\n    r._measurement == \"C8Kv_Snmp_v2c\" and                     // 筛选SNMP采集的思科路由器数据\r\n    (r._field == \"MemoryFree\" or r._field == \"MemoryUsed\")    // 同时获取空闲内存和已用内存数据\r\n  )\r\n  |> pivot(                                                   // 将多行数据透视为单行，便于计算内存利用率\r\n    rowKey:[\"_time\", \"source\"],                           // 按时间和主机名分组\r\n    columnKey: [\"_field\"],                                    // 将字段名作为列名\r\n    valueColumn: \"_value\"                                     // 将值放入对应列中\r\n  )\r\n  |> map(fn: (r) => ({                                        // 将字符串值转换为浮点数，以便进行数学计算\r\n    r with \r\n    MemoryFree: float(v: r.MemoryFree),\r\n    MemoryUsed: float(v: r.MemoryUsed)\r\n  }))\r\n  |> map(fn: (r) => ({                                            // 计算内存利用率：已用内存/(已用内存+空闲内存)*100%\r\n    r with \r\n    memory_utilization: r.MemoryUsed / (r.MemoryUsed + r.MemoryFree) * 100.0\r\n  }))\r\n  |> keep(columns: [\"_time\", \"source\", \"memory_utilization\"]) // 只保留时间戳、主机名和内存利用率\r\n  |> yield(name: \"memory_utilization\")                            // 将结果命名为\"memory_utilization\"以在图表中显示\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "路由器内存利用率",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "qyt-influxdb2"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": null,
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "qyt-influxdb2"
+          },
+          "query": "from(bucket: \"qytdb\")                                         // 从名为\"qytdb\"的数据桶中读取数据\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)    // 根据仪表板设置的时间范围筛选数据\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"interface_table\") // 筛选接口表数据\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifInOctets\")           // 只保留入向字节数据\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))        // 将字节转换为位（乘以8）\r\n  |> derivative(unit: 1s, nonNegative: false)                 // 计算每秒变化率（即比特/秒）\r\n  |> filter(fn: (r) => r._value > 0)                          // 去除负数和0的值，避免数据异常\r\n  |> map(fn: (r) => ({                                        // 重新映射数据，添加自定义字段和测量名\r\n      r with \r\n      _field: \"InSpeed\",                                      // 修改字段名为InSpeed\r\n      _measurement: \"InSpeed \" + r.source + \" \" + r.ifDescr // 自定义图例，包含设备名和接口描述\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_value\", \"_measurement\"])       // 只保留时间戳、速率值和自定义测量名\r\n  |> yield(name: \"derivative\")                                // 将结果命名为\"derivative\"以在图表中显示\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "路由器 接口速率入向",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "qyt-influxdb2"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": null,
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "qyt-influxdb2"
+          },
+          "query": "from(bucket: \"qytdb\")                                         // 从名为\"qytdb\"的数据桶中读取数据\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)    // 根据仪表板设置的时间范围筛选数据\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"interface_table\") // 筛选接口表数据\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ifOutOctets\")          // 只保留出向字节数据\r\n  |> map(fn: (r) => ({ r with _value: r._value * 8 }))        // 将字节转换为位（乘以8）\r\n  |> derivative(unit: 1s, nonNegative: false)                 // 计算每秒变化率（即比特/秒）\r\n  |> filter(fn: (r) => r._value > 0)                          // 去除负数和0的值，避免数据异常\r\n  |> map(fn: (r) => ({                                        // 重新映射数据，添加自定义字段和测量名\r\n      r with \r\n      _field: \"OutSpeed\",                                     // 修改字段名为OutSpeed\r\n      _measurement: \"OutSpeed \" + r.source + \" \" + r.ifDescr // 自定义图例，包含设备名和接口描述\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_value\", \"_measurement\"])       // 只保留时间戳、速率值和自定义测量名\r\n  |> yield(name: \"derivative\")                                // 将结果命名为\"derivative\"以在图表中显示\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "路由器 接口速率出向",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "SNMP Dashboard",
+  "uid": null,
+  "version": 2,
+  "weekStart": ""
+}

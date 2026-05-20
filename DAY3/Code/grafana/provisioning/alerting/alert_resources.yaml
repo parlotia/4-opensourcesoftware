@@ -1,0 +1,32 @@
+apiVersion: 1
+
+deleteContactPoints:
+  - orgId: 1
+    uid: day3_dingtalk_cp
+
+contactPoints:
+  - orgId: 1
+    name: day3-dingtalk
+    receivers:
+      - uid: day3_dingtalk_builtin
+        type: dingding
+        settings:
+          url: ${DINGTALK_WEBHOOK_URL}
+          msgType: link
+          message: |
+            【告警】{{ template "default.message" . }}
+
+# 注意：Grafana 文件 provisioning 的 policies 会覆盖整个通知策略树。
+# 本实验栈单独使用 Grafana，因此直接把默认策略指向 Grafana 内建 DingDing 联系点。
+# 如果同一个 Grafana 还要承载其他项目告警，请改为 UI 维护策略或拆成子路由。
+policies:
+  - orgId: 1
+    receiver: day3-dingtalk
+    group_by:
+      - grafana_folder
+      - alertname
+      - protocol
+    group_wait: 0s
+    group_interval: 10s
+    repeat_interval: 1m
+    routes: []

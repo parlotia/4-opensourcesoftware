@@ -1,0 +1,194 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: day3_cpu_group
+    folder: Day3 TIG
+    interval: 10s
+    rules:
+      - uid: day3_cpu_snmp_c8kv
+        title: "【告警】C8Kv SNMP IOSd CPU 超过 3%"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: qyt-influxdb2
+            model:
+              datasource:
+                type: influxdb
+                uid: qyt-influxdb2
+              intervalMs: 1000
+              maxDataPoints: 43200
+              query: |
+                from(bucket: "qytdb")
+                  |> range(start: -1m)
+                  |> filter(fn: (r) => r._measurement == "C8Kv_Snmp_v2c" and r._field == "CPUTotal5sec-iosd")
+                  |> group()
+                  |> max()
+                  |> keep(columns: ["_time", "_value"])
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 3
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: OK
+        for: 0s
+        annotations:
+          summary: |
+            【告警】SNMP CPUTotal5sec-iosd 超过 3%（实验阈值）
+          description: |
+            Influx: qytdb / measurement C8Kv_Snmp_v2c / field CPUTotal5sec-iosd
+        labels:
+          day3_alert: cpu
+          protocol: snmp
+        isPaused: false
+
+      - uid: day3_cpu_grpc_c8kv
+        title: "【告警】C8Kv gRPC CPU 超过 3%"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: qyt-influxdb2
+            model:
+              datasource:
+                type: influxdb
+                uid: qyt-influxdb2
+              intervalMs: 1000
+              maxDataPoints: 43200
+              query: |
+                from(bucket: "qytdb")
+                  |> range(start: -1m)
+                  |> filter(fn: (r) =>
+                    r._measurement == "Cisco-IOS-XE-process-cpu-oper:cpu-usage/cpu-utilization" and
+                    r._field == "five_seconds"
+                  )
+                  |> group()
+                  |> max()
+                  |> keep(columns: ["_time", "_value"])
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 3
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: OK
+        for: 0s
+        annotations:
+          summary: |
+            【告警】gRPC five_seconds CPU 超过 3%（实验阈值）
+          description: |
+            Influx: qytdb / Cisco-IOS-XE-process-cpu-oper:cpu-usage/cpu-utilization
+        labels:
+          day3_alert: cpu
+          protocol: grpc
+        isPaused: false

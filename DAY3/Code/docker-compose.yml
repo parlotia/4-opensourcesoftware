@@ -1,0 +1,68 @@
+services:
+  qyt-influx:
+    image: influxdb:2.7.9
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb2-data:/var/lib/influxdb2
+      - influxdb2-config:/etc/influxdb2
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: Cisc0123
+      DOCKER_INFLUXDB_INIT_ORG: qytang
+      DOCKER_INFLUXDB_INIT_BUCKET: qytdb
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: qytang-day3-token
+    networks:
+      qyt_net:
+        aliases:
+          - influx.qytopensource.com
+    restart: unless-stopped
+
+  qyt-telegraf:
+    image: telegraf:1.31.2
+    user: root
+    ports:
+      - "57000:57000"
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    environment:
+      INFLUX_TOKEN: qytang-day3-token
+      INFLUX_ORG: qytang
+      INFLUX_BUCKET: qytdb
+    depends_on:
+      - qyt-influx
+    networks:
+      - qyt_net
+    restart: unless-stopped
+
+  qyt-grafana:
+    image: grafana/grafana:11.1.1
+    user: root
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: Cisc0123
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      DINGTALK_WEBHOOK_URL: ${DINGTALK_WEBHOOK_URL:-}
+    depends_on:
+      - qyt-influx
+    networks:
+      qyt_net:
+        aliases:
+          - grafana.qytopensource.com
+    restart: unless-stopped
+
+networks:
+  qyt_net:
+    driver: bridge
+
+volumes:
+  influxdb2-data:
+  influxdb2-config:
+  grafana-data:

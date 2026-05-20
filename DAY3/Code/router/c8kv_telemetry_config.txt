@@ -1,0 +1,35 @@
+! ============================================================
+! C8Kv 路由器 SNMP + gRPC Telemetry 配置
+! 在 C8Kv1 (10.10.1.201) 和 C8Kv2 (10.10.1.202) 上执行
+! 监控服务器 IP: 10.10.1.205
+! ============================================================
+
+! ----- SNMP 只读 Community -----
+snmp-server community qytangro RO
+
+! ----- 启用 NETCONF/YANG（gRPC telemetry 前置依赖） -----
+netconf-yang
+
+! ----- gRPC Telemetry: CPU 5秒均值 -----
+telemetry ietf subscription 666
+ encoding encode-kvgpb
+ filter xpath /process-cpu-ios-xe-oper:cpu-usage/cpu-utilization/five-seconds
+ stream yang-push
+ update-policy periodic 1000
+ receiver ip address 10.10.1.205 57000 protocol grpc-tcp
+
+! ----- gRPC Telemetry: 内存统计 -----
+telemetry ietf subscription 667
+ encoding encode-kvgpb
+ filter xpath /memory-ios-xe-oper:memory-statistics/memory-statistic
+ stream yang-push
+ update-policy periodic 1000
+ receiver ip address 10.10.1.205 57000 protocol grpc-tcp
+
+! ----- gRPC Telemetry: 接口统计 -----
+telemetry ietf subscription 671
+ encoding encode-kvgpb
+ filter xpath /interfaces-ios-xe-oper:interfaces/interface/statistics
+ stream yang-push
+ update-policy periodic 1000
+ receiver ip address 10.10.1.205 57000 protocol grpc-tcp

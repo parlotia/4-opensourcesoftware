@@ -1,0 +1,16 @@
+apiVersion: 1
+
+datasources:
+  - name: QYT InfluxDB2
+    uid: qyt-influxdb2
+    type: influxdb
+    access: proxy
+    url: http://qyt-influx:8086
+    isDefault: true
+    jsonData:
+      version: Flux
+      organization: qytang
+      defaultBucket: qytdb
+      tlsSkipVerify: true
+    secureJsonData:
+      token: qytang-day3-token
