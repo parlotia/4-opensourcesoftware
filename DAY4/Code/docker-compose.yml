@@ -1,0 +1,52 @@
+services:
+  gnmic:
+    image: ghcr.io/openconfig/gnmic:latest
+    command: subscribe --config /app/gnmic.yaml
+    ports:
+      - "9804:9804"
+    volumes:
+      - ./gnmic.yaml:/app/gnmic.yaml:ro
+      - ./cert:/app/cert:ro
+    networks:
+      - gnmi_net
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      - gnmic
+    networks:
+      - gnmi_net
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.1.1
+    user: root
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: Cisc0123
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    depends_on:
+      - prometheus
+    networks:
+      - gnmi_net
+    restart: unless-stopped
+
+networks:
+  gnmi_net:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:

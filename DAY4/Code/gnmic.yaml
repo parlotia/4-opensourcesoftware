@@ -1,0 +1,42 @@
+username: admin
+password: Cisc0123
+tls-ca: /app/cert/ca.cer
+encoding: json_ietf
+log: true
+
+targets:
+  C9800:
+    address: 10.10.1.203:9339
+
+subscriptions:
+  interface-counters:
+    paths:
+      - /interfaces/interface/state/counters
+    mode: stream
+    stream-mode: sample
+    sample-interval: 10s
+
+  cpu:
+    paths:
+      - /components/component/cpu/utilization/state/instant
+    mode: stream
+    stream-mode: sample
+    sample-interval: 10s
+
+  memory:
+    paths:
+      - /system/memory/state
+    mode: stream
+    stream-mode: sample
+    sample-interval: 10s
+
+outputs:
+  prom-pull:
+    type: prometheus
+    listen: :9804
+    path: /metrics
+    expiration: 60s
+    metric-prefix: gnmic
+    append-subscription-name: true
+    override-timestamps: true
+    strings-as-labels: true

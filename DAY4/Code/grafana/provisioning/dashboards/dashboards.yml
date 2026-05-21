@@ -1,0 +1,12 @@
+apiVersion: 1
+
+providers:
+  - name: Day4 gNMIc
+    orgId: 1
+    folder: Day4 gNMIc
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
