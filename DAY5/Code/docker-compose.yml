@@ -1,0 +1,88 @@
+name: day5-netflow
+
+services:
+  elasticsearch:
+    image: elastic/elasticsearch:7.17.21
+    environment:
+      - discovery.type=single-node
+      - node.name=qytang_es
+      - cluster.name=qytang_es_cluster
+      - network.host=0.0.0.0
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - xpack.security.enabled=false
+      - TZ=Asia/Shanghai
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - qyt_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.21
+    environment:
+      - SERVER_NAME=qyt_kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - XPACK_SECURITY_ENABLED=false
+      - TZ=Asia/Shanghai
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - qyt_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5601/api/status >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+    restart: unless-stopped
+
+  filebeat-netflow:
+    image: elastic/filebeat:7.17.21
+    user: root
+    privileged: true
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./filebeat-netflow/netflow.yml:/usr/share/filebeat/modules.d/netflow.yml:ro
+      - ./filebeat-netflow/netflow-mod-ip.js:/etc/filebeat/netflow-mod-ip.js:ro
+      - ./filebeat-netflow/netflow-mod-domain.js:/etc/filebeat/netflow-mod-domain.js:ro
+      - ./filebeat-netflow/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    ports:
+      - "2055:2055/udp"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+    networks:
+      - qyt_net
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    restart: unless-stopped
+
+networks:
+  qyt_net:
+    driver: bridge
+
+volumes:
+  elasticsearch-data:
